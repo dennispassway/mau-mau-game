@@ -4,7 +4,7 @@ export function createDeck() {
     return specialOnes[c] || c
   })
 
-  const cardTypes = ['hearts', 'spades', 'clubs', 'diamonds']
+  const cardTypes = ['heart', 'spade', 'clubs', 'diamond']
   const cards = cardTypes.map(type => cardNumbers.map(number => ({ number, type })))
 
   return shuffle([].concat(...cards))
