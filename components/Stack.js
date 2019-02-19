@@ -3,8 +3,8 @@ import styled from 'styled-components'
 
 const Container = styled.div`
   position: relative;
-  height: 360px;
-  width: 250px;
+  height: 240px;
+  width: 175px;
 `
 
 const CardContainer = styled.div`

@@ -2,9 +2,8 @@ import Card from './Card'
 import styled from 'styled-components'
 
 const Container = styled.div`
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
-  border: solid 1px white;
   margin: 50px 0;
   overflow: hidden;
   padding: 50px;

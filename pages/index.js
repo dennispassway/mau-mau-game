@@ -1,11 +1,11 @@
 import { Component } from 'react'
 import { createDeck, createPlayers, grabCards } from '../utils'
+import { createGlobalStyle } from 'styled-components'
 import Deck from '../components/Deck'
+import Head from 'next/head'
 import Player from '../components/Player'
 import Stack from '../components/Stack'
-import Head from 'next/head'
 import styled from 'styled-components'
-import { createGlobalStyle } from 'styled-components'
 
 const GlobalStyle = createGlobalStyle`
   html {
@@ -20,11 +20,26 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
   }
+
+  body {
+    background-color: #6BD4ff;
+    min-height: 100vh;
+  }
 `
 
 const StackDeckContainer = styled.div`
-  display: flex;
   align-items: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  padding: 50px;
+  width: 100%;
+
+  & > * {
+    margin: 0 50px;
+  }
 `
 
 const PlayersContainer = styled.div`
@@ -33,7 +48,7 @@ const PlayersContainer = styled.div`
   justify-content: space-around;
 `
 
-const playerAmount = 4
+const playerAmount = 1
 const cardsPerPlayer = 7
 
 export default class Index extends Component {
@@ -51,7 +66,7 @@ export default class Index extends Component {
     const stack = grabCards(deck, 1)
 
     this.setState({ deck, players, stack, currentPlayer: 0 })
-    setTimeout(() => this.gameTurn())
+    setTimeout(() => this.gameTurn()) // hack: next tick
   }
 
   render() {
@@ -62,7 +77,7 @@ export default class Index extends Component {
     }
 
     return (
-      <div style={{ backgroundColor: '#6BD425' }}>
+      <div>
         <Head>
           <link href='https://fonts.googleapis.com/css?family=Merriweather:400,700' rel='stylesheet' />
         </Head>
@@ -100,6 +115,8 @@ export default class Index extends Component {
     if (!playableCards || !playableCards.length) {
       return player.cards = [...player.cards, ...grabCards(deck, 1)]
     }
+
+    // TODO: if deck is empty reshuffle it
 
     this.playCard(player, playableCards[0])
   }

@@ -2,9 +2,9 @@ import Card from './Card'
 import styled from 'styled-components'
 
 const Container = styled.div`
-  position: relative;
-  height: 360px;
-  width: 250px;
+position: relative;
+height: 240px;
+width: 175px;
 `
 
 const CardContainer = styled.div`
@@ -18,7 +18,7 @@ export default function Deck({ cards }) {
     <Container>
       {cards.reverse().map(({ type, number }, i) => (
         <CardContainer key={i}>
-          <Card type={type} number={number} />
+          <Card type={type} number={number} closed />
         </CardContainer>
       ))}
     </Container>

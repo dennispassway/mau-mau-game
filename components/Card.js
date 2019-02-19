@@ -8,18 +8,39 @@ const icons = {
   spade: Spade
 }
 
+const AspectRatio = styled.div`
+  padding-bottom: 137%;
+  position: relative;
+  width: 100px;
+
+  @media (min-width: 768px) {
+    width: 175px;
+  }
+`
+
 const Container = styled.div`
-  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.2);
   align-items: center;
   background-color: #ffffff;
   border-radius: 4px;
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
   display: flex;
   font-family: 'Merriweather', serif;
-  height: 240px;
+  height: 100%;
   justify-content: center;
-  position: relative;
-  width: 175px;
+  overflow: hidden;
+  position: absolute;
+  width: 100%;
+
+  &::before, &::after {
+    content: '';
+    height: 100%;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 10;
+  }
 `
 
 const CornerInfo = styled.div`
@@ -61,14 +82,41 @@ const CenterText = styled.div`
   transform: translate(-50%, -50%);
 `
 
-export default function Card({ type, number }) {
+const ClosedCard = styled.div`
+  background: repeating-linear-gradient(
+    45deg,
+    #E71D36,
+    #E71D36 10px,
+    #011627 10px,
+    #011627 20px
+  );
+  border-radius: 4px;
+  height: calc(100% - 40px);
+  left: 20px;
+  position: absolute;
+  top: 20px;
+  width: calc(100% - 40px);
+`
+
+export default function Card({ type, number, closed }) {
+  if (closed) {
+    return (
+      <AspectRatio>
+        <Container>
+          <ClosedCard />
+        </Container>
+      </AspectRatio>
+    )
+  }
 
   return (
-    <Container>
-      <CornerInformation type={type} number={number} isLeft />
-      <CornerInformation type={type} number={number} rotation={180} />
-      <CenterPiece number={number} type={type} />
-    </Container>
+    <AspectRatio>
+      <Container>
+        <CornerInformation type={type} number={number} isLeft />
+        <CornerInformation type={type} number={number} rotation={180} />
+        <CenterPiece number={number} type={type} />
+      </Container>
+    </AspectRatio>
   )
 }
 
