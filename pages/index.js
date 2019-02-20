@@ -4,6 +4,7 @@ import { createGlobalStyle } from 'styled-components'
 import config from '../config'
 import Deck from '../components/Deck'
 import Head from 'next/head'
+import Overlay from '../components/Overlay'
 import Player from '../components/Player'
 import Stack from '../components/Stack'
 import styled from 'styled-components'
@@ -24,7 +25,7 @@ const GlobalStyle = createGlobalStyle`
 
   body {
     background-color: ${config.blue};
-    font-family: 'Merriweather', serif;
+    font-family: 'Roboto', sans-serif;
     min-height: 100vh;
   }
 `
@@ -57,6 +58,7 @@ export default class Index extends Component {
     deck: null,
     players: null,
     stack: null,
+    showStartOverlay: true
   }
 
   componentDidMount() {
@@ -65,11 +67,10 @@ export default class Index extends Component {
     const stack = grabCards(deck, 1)
 
     this.setState({ deck, players, stack, currentPlayer: 0 })
-    setTimeout(() => this.gameTurn()) // hack: next tick
   }
 
   render() {
-    const { deck, stack, players } = this.state
+    const { deck, stack, players, showStartOverlay } = this.state
 
     if (!players) {
       return null
@@ -88,6 +89,16 @@ export default class Index extends Component {
         <PlayersContainer>
           {players.map(({ name, cards }, i) => <Player key={i} name={name} cards={cards} />)}
         </PlayersContainer>
+
+        {showStartOverlay && <Overlay
+          title='Mau Mau Game'
+          text='Mau-Mau is a card game for 2 to 5 players that is popular in Germany, Austria, South Tyrol, the United States, Brazil, Poland, and the Netherlands. Mau-Mau is a member of the larger Crazy Eights or shedding family, to which e.g. the proprietary card games of Uno and Flaps belong. However Mau-Mau is played with standard French or German-suited playing cards.'
+          buttonLabel='Start het spel'
+          onClick={() => {
+            this.setState({ showStartOverlay: false })
+            this.gameTurn()
+          }}
+        />}
       </div>
     )
   }
@@ -103,7 +114,7 @@ export default class Index extends Component {
 
     this.setState({ currentPlayer: currentPlayer === (config.playerAmount - 1) ? 0 : currentPlayer + 1 })
 
-    setTimeout(() => this.gameTurn(), 100)
+    setTimeout(() => this.gameTurn(), 500)
   }
 
   playerTurn(player) {
