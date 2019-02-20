@@ -57,24 +57,18 @@ export default class Index extends Component {
     currentPlayer: null,
     deck: null,
     players: null,
+    showLastCardFor: null,
+    showStartOverlay: true,
     stack: null,
-    showStartOverlay: true
+    winner: null
   }
 
   componentDidMount() {
-    const deck = createDeck()
-    const players = createPlayers(config.playerAmount, config.cardsPerPlayer, deck)
-    const stack = grabCards(deck, 1)
-
-    this.setState({ deck, players, stack, currentPlayer: 0 })
+    this.restart()
   }
 
   render() {
-    const { deck, stack, players, showStartOverlay } = this.state
-
-    if (!players) {
-      return null
-    }
+    const { deck, stack, players, showStartOverlay, showLastCardFor, winner } = this.state
 
     return (
       <div>
@@ -83,24 +77,45 @@ export default class Index extends Component {
         </Head>
         <GlobalStyle />
         <StackDeckContainer>
-          <Stack cards={stack} />
-          <Deck cards={deck} />
+          {stack && <Stack cards={stack} />}
+          {deck && <Deck cards={deck} />}
         </StackDeckContainer>
-        <PlayersContainer>
-          {players.map(({ name, cards }, i) => <Player key={i} name={name} cards={cards} />)}
-        </PlayersContainer>
+        {players && (
+          <PlayersContainer>
+            {players.map(({ name, cards }, i) => <Player key={i} name={name} cards={cards} />)}
+          </PlayersContainer>
+        )}
 
         {showStartOverlay && <Overlay
           title='Mau Mau Game'
           text='Mau-Mau is a card game for 2 to 5 players that is popular in Germany, Austria, South Tyrol, the United States, Brazil, Poland, and the Netherlands. Mau-Mau is a member of the larger Crazy Eights or shedding family, to which e.g. the proprietary card games of Uno and Flaps belong. However Mau-Mau is played with standard French or German-suited playing cards.'
           buttonLabel='Start the game'
-          onClick={() => {
-            this.setState({ showStartOverlay: false })
-            this.gameTurn()
-          }}
+          onClick={() => this.startGame()}
+        />}
+
+        {showLastCardFor && <Overlay title='Last card for Thomas!' />}
+
+        {winner && <Overlay
+          title={`Game over! ${winner} has won!`}
+          text='That was fun! Want to make them play again?'
+          buttonLabel='Play again'
+          onClick={() => this.restart()}
         />}
       </div>
     )
+  }
+
+  startGame() {
+    this.setState({ showStartOverlay: false })
+    this.gameTurn()
+  }
+
+  restart() {
+    const deck = createDeck()
+    const players = createPlayers(config.playerAmount, config.cardsPerPlayer, deck)
+    const stack = grabCards(deck, 1)
+
+    this.setState({ deck, players, stack, currentPlayer: 0, showStartOverlay: true, showLastCardFor: null, winner: null })
   }
 
   gameTurn() {
@@ -109,7 +124,7 @@ export default class Index extends Component {
     this.playerTurn(players[currentPlayer])
 
     if (players[currentPlayer].cards.length === 0) {
-      return console.log('Game over. Winner: ', players[currentPlayer].name)
+      return this.setState({ winner: players[currentPlayer].name })
     }
 
     this.setState({ currentPlayer: currentPlayer === (config.playerAmount - 1) ? 0 : currentPlayer + 1 })
