@@ -1,3 +1,5 @@
+/* @TODO: game logic could be neater with promises and async await, also, utils are not really utils anymore */
+
 import { Component } from 'react'
 import { createDeck, createPlayers, grabCards, shuffle } from '../utils'
 import { createGlobalStyle } from 'styled-components'
