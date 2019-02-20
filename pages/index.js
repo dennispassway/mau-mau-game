@@ -48,7 +48,7 @@ const PlayersContainer = styled.div`
   justify-content: space-around;
 `
 
-const playerAmount = 1
+const playerAmount = 4
 const cardsPerPlayer = 7
 
 export default class Index extends Component {
@@ -122,6 +122,10 @@ export default class Index extends Component {
       const shuffledDeck = shuffle(newDeck)
 
       this.setState({ deck: shuffledDeck })
+    }
+
+    if (player.cards.length === 2) {
+      console.log('Last card for ', player.name)
     }
 
     this.playCard(player, playableCards[0])
