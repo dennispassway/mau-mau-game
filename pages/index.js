@@ -58,7 +58,7 @@ export default class Index extends Component {
     deck: null,
     players: null,
     showLastCardFor: null,
-    showStartOverlay: true,
+    showStartOverlay: null,
     stack: null,
     winner: null
   }
@@ -86,16 +86,18 @@ export default class Index extends Component {
           </PlayersContainer>
         )}
 
-        {showStartOverlay && <Overlay
+        {showStartOverlay && (<Overlay
+          key={Math.random()}
           title='Mau Mau Game'
           text='Mau-Mau is a card game for 2 to 5 players that is popular in Germany, Austria, South Tyrol, the United States, Brazil, Poland, and the Netherlands. Mau-Mau is a member of the larger Crazy Eights or shedding family, to which e.g. the proprietary card games of Uno and Flaps belong. However Mau-Mau is played with standard French or German-suited playing cards.'
           buttonLabel='Start the game'
           onClick={() => this.startGame()}
-        />}
+        />)}
 
-        {showLastCardFor && <Overlay title='Last card for Thomas!' />}
+        {showLastCardFor && <Overlay key='lastCard' title={`Last card for ${showLastCardFor}!`} />}
 
         {winner && <Overlay
+          key='winner'
           title={`Game over! ${winner} has won!`}
           text='That was fun! Want to make them play again?'
           buttonLabel='Play again'
@@ -129,11 +131,13 @@ export default class Index extends Component {
 
     this.setState({ currentPlayer: currentPlayer === (config.playerAmount - 1) ? 0 : currentPlayer + 1 })
 
-    setTimeout(() => this.gameTurn(), 500)
+    setTimeout(() => this.gameTurn(), config.playSpeed)
   }
 
   playerTurn(player) {
     const { stack, deck } = this.state
+
+    this.setState({ showLastCardFor: null })
 
     const playableCards = player.cards.filter(card => this.mayPlayCard(card, stack[stack.length - 1]))
 
@@ -150,7 +154,7 @@ export default class Index extends Component {
     }
 
     if (player.cards.length === 2) {
-      console.log('Last card for ', player.name)
+      this.setState({ showLastCardFor: player.name })
     }
 
     this.playCard(player, playableCards[0])

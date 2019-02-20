@@ -1,5 +1,11 @@
 import config from '../config'
 import styled from 'styled-components'
+import posed from 'react-pose'
+
+const FadeInUp = posed.div({
+  mounted: { opacity: 1, y: 0 },
+  unmounted: { opacity: 0, y: 200 }
+})
 
 const Container = styled.div`
   align-items: center;
@@ -71,11 +77,10 @@ export default function Overlay({ title, text, onClick, buttonLabel }) {
   return (
     <Container>
       <Background />
-
       <Content>
-        {title && <Title>{title}</Title>}
-        {text && <Text>{text}</Text>}
-        {onClick && buttonLabel && <Button onClick={() => onClick()}>{buttonLabel}</Button>}
+        {title && <FadeInUp initialPose='unmounted' pose='mounted'><Title>{title}</Title></FadeInUp>}
+        {text && <FadeInUp initialPose='unmounted' pose='mounted'><Text>{text}</Text></FadeInUp>}
+        {onClick && buttonLabel && <FadeInUp initialPose='unmounted' pose='mounted'><Button onClick={() => onClick()}>{buttonLabel}</Button></FadeInUp>}
       </Content>
     </Container>
   )
