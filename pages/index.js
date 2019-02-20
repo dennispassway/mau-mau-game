@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import { createDeck, createPlayers, grabCards } from '../utils'
+import { createDeck, createPlayers, grabCards, shuffle } from '../utils'
 import { createGlobalStyle } from 'styled-components'
 import Deck from '../components/Deck'
 import Head from 'next/head'
@@ -116,7 +116,13 @@ export default class Index extends Component {
       return player.cards = [...player.cards, ...grabCards(deck, 1)]
     }
 
-    // TODO: if deck is empty reshuffle it
+    if (deck.length === 0) {
+      const cardsButOne = stack.length - 1
+      const newDeck = grabCards(stack, cardsButOne)
+      const shuffledDeck = shuffle(newDeck)
+
+      this.setState({ deck: shuffledDeck })
+    }
 
     this.playCard(player, playableCards[0])
   }

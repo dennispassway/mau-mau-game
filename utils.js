@@ -18,7 +18,7 @@ export function grabCards(deck, amount) {
   return deck.splice(0, amount)
 }
 
-function shuffle(array) {
+export function shuffle(array) {
   return array.sort(() => Math.random() - Math.random())
 }
 
