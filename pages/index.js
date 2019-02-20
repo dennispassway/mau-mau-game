@@ -1,6 +1,7 @@
 import { Component } from 'react'
 import { createDeck, createPlayers, grabCards, shuffle } from '../utils'
 import { createGlobalStyle } from 'styled-components'
+import config from '../config'
 import Deck from '../components/Deck'
 import Head from 'next/head'
 import Player from '../components/Player'
@@ -22,7 +23,8 @@ const GlobalStyle = createGlobalStyle`
   }
 
   body {
-    background-color: #6BD4ff;
+    background-color: ${config.blue};
+    font-family: 'Merriweather', serif;
     min-height: 100vh;
   }
 `
@@ -48,9 +50,6 @@ const PlayersContainer = styled.div`
   justify-content: space-around;
 `
 
-const playerAmount = 4
-const cardsPerPlayer = 7
-
 export default class Index extends Component {
 
   state = {
@@ -62,7 +61,7 @@ export default class Index extends Component {
 
   componentDidMount() {
     const deck = createDeck()
-    const players = createPlayers(playerAmount, cardsPerPlayer, deck)
+    const players = createPlayers(config.playerAmount, config.cardsPerPlayer, deck)
     const stack = grabCards(deck, 1)
 
     this.setState({ deck, players, stack, currentPlayer: 0 })
@@ -102,7 +101,7 @@ export default class Index extends Component {
       return console.log('Game over. Winner: ', players[currentPlayer].name)
     }
 
-    this.setState({ currentPlayer: currentPlayer === (playerAmount - 1) ? 0 : currentPlayer + 1 })
+    this.setState({ currentPlayer: currentPlayer === (config.playerAmount - 1) ? 0 : currentPlayer + 1 })
 
     setTimeout(() => this.gameTurn(), 100)
   }

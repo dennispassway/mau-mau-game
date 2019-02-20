@@ -1,4 +1,5 @@
 import Card from './Card'
+import config from '../config'
 import styled from 'styled-components'
 
 const Container = styled.div`
@@ -9,7 +10,7 @@ const Container = styled.div`
   padding: 50px;
   width: 100%;
 
-  @media (min-width: 768px) {
+  @media (${config.viewportM}) {
     width: calc(50% - 100px);
   }
 `
@@ -32,7 +33,6 @@ const CardContainer = styled.div`
 
 const Name = styled.div`
   color: #fff;
-  font-family: 'Merriweather', serif;
   font-weight: 400;
   font-size: 24px;
   line-height: 1;

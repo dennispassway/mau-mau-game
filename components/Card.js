@@ -1,5 +1,6 @@
-import styled from 'styled-components'
 import { Clubs, Diamond, Heart, Spade } from './Icons'
+import config from '../config'
+import styled from 'styled-components'
 
 const icons = {
   clubs: Clubs,
@@ -13,7 +14,7 @@ const AspectRatio = styled.div`
   position: relative;
   width: 100px;
 
-  @media (min-width: 768px) {
+  @media (${config.viewportM}) {
     width: 175px;
   }
 `
@@ -25,7 +26,6 @@ const Container = styled.div`
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
   display: flex;
-  font-family: 'Merriweather', serif;
   height: 100%;
   justify-content: center;
   overflow: hidden;
@@ -56,7 +56,6 @@ const CornerInfo = styled.div`
 `
 
 const Number = styled.div`
-  font-family: 'Merriweather', serif;
   font-weight: 700;
   font-size: 20px;
   line-height: 1;
@@ -72,7 +71,6 @@ const IconContainer = styled.div`
 `
 
 const CenterText = styled.div`
-  font-family: 'Merriweather', serif;
   font-size: 30px;
   font-weight: 400;
   left: 50%;
@@ -85,10 +83,10 @@ const CenterText = styled.div`
 const ClosedCard = styled.div`
   background: repeating-linear-gradient(
     45deg,
-    #E71D36,
-    #E71D36 10px,
-    #011627 10px,
-    #011627 20px
+    ${config.red},
+    ${config.red} 10px,
+    ${config.black} 10px,
+    ${config.black} 20px
   );
   border-radius: 4px;
   height: calc(100% - 40px);
@@ -150,6 +148,6 @@ function getName(number) {
 }
 
 function getColor(type) {
-  const map = { heart: '#E71D36', spade: '#011627', clubs: '#011627', diamond: '#E71D36', }
+  const map = { heart: config.red, spade: config.black, clubs: config.black, diamond: config.red, }
   return map[type]
 }

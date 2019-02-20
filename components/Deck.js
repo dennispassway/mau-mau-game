@@ -2,9 +2,9 @@ import Card from './Card'
 import styled from 'styled-components'
 
 const Container = styled.div`
-position: relative;
-height: 240px;
-width: 175px;
+  position: relative;
+  height: 240px;
+  width: 175px;
 `
 
 const CardContainer = styled.div`
