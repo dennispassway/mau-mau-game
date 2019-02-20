@@ -73,7 +73,7 @@ export default class Index extends Component {
     return (
       <div>
         <Head>
-          <link href='https://fonts.googleapis.com/css?family=Merriweather:400,700' rel='stylesheet' />
+          <link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' />
         </Head>
         <GlobalStyle />
         <StackDeckContainer>
