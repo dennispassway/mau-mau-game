@@ -1,5 +1,11 @@
 import Card from './Card'
+import posed, { PoseGroup } from 'react-pose'
 import styled from 'styled-components'
+
+const CardContainer = posed.div({
+  enter: { opacity: 1, y: 0, rotate: ({ rotation }) => rotation },
+  exit: { opacity: 0, y: 100 }
+})
 
 const Container = styled.div`
   position: relative;
@@ -7,21 +13,22 @@ const Container = styled.div`
   width: 175px;
 `
 
-const CardContainer = styled.div`
+const StyledCardContainer = styled(CardContainer)`
   position: absolute;
   top: 0;
   left: 0;
-  transform: rotate(${({ rotation }) => rotation}deg);
 `
 
 export default function Stack({ cards }) {
   return (
     <Container>
-      {cards.map(({ type, number }, i) => (
-        <CardContainer key={i} rotation={Math.floor(Math.random() * 20) - 10}>
-          <Card type={type} number={number} />
-        </CardContainer>
-      ))}
+      <PoseGroup>
+        {cards.map(({ type, number }, i) => (
+          <StyledCardContainer key={i} rotation={Math.floor(Math.random() * 10) - 5}>
+            <Card type={type} number={number} />
+          </StyledCardContainer>
+        ))}
+      </PoseGroup>
     </Container>
   )
 }

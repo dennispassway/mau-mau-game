@@ -1,3 +1,4 @@
+import { Component } from 'react'
 import { Clubs, Diamond, Heart, Spade } from './Icons'
 import config from '../config'
 import styled from 'styled-components'
@@ -31,16 +32,6 @@ const Container = styled.div`
   overflow: hidden;
   position: absolute;
   width: 100%;
-
-  &::before, &::after {
-    content: '';
-    height: 100%;
-    left: 0;
-    position: absolute;
-    top: 0;
-    width: 100%;
-    z-index: 10;
-  }
 `
 
 const CornerInfo = styled.div`
