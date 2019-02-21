@@ -1,7 +1,6 @@
 /* @TODO: game logic could be neater with promises and async await, also, utils are not really utils anymore */
 
 import { Component } from 'react'
-import { createDeck, createPlayers, grabCards, shuffle } from '../utils'
 import { createGlobalStyle } from 'styled-components'
 import config from '../config'
 import Deck from '../components/Deck'
@@ -66,7 +65,7 @@ export default class Index extends Component {
   }
 
   componentDidMount() {
-    this.restart()
+    this.setupGame()
   }
 
   render() {
@@ -88,6 +87,8 @@ export default class Index extends Component {
           </PlayersContainer>
         )}
 
+        {/* @TODO: set overlay and content in state */}
+
         {showStartOverlay && (<Overlay
           title='Mau Mau Game'
           text='Mau-Mau is a card game for 2 to 5 players that is popular in Germany, Austria, South Tyrol, the United States, Brazil, Poland, and the Netherlands. Mau-Mau is a member of the larger Crazy Eights or shedding family, to which e.g. the proprietary card games of Uno and Flaps belong. However Mau-Mau is played with standard French or German-suited playing cards.'
@@ -101,7 +102,7 @@ export default class Index extends Component {
           title={`Game over! ${winner} has won!`}
           text='That was fun! Want to make them play again?'
           buttonLabel='Play again'
-          onClick={() => this.restart()}
+          onClick={() => this.setupGame()}
         />}
       </div>
     )
@@ -112,42 +113,30 @@ export default class Index extends Component {
     this.gameTurn()
   }
 
-  restart() {
-    const deck = createDeck()
-    const players = createPlayers(config.playerAmount, config.cardsPerPlayer, deck)
-    const stack = grabCards(deck, 1)
+  setupGame() {
+    const [firstCard, ...deck] = createDeck()
+    const players = createPlayers(config.playerAmount, config.cardsPerPlayer, deck) // @TODO: mutate deck here, comment mutates deck
+    const stack = [firstCard]
 
     this.setState({ deck, players, stack, currentPlayer: 0, showStartOverlay: true, showLastCardFor: null, winner: null })
   }
 
   gameTurn() {
-    const { currentPlayer, players } = this.state
-
-    this.playerTurn(players[currentPlayer])
-
-    if (players[currentPlayer].cards.length === 0) {
-      return this.setState({ winner: players[currentPlayer].name })
-    }
-
-    this.setState({ currentPlayer: currentPlayer === (config.playerAmount - 1) ? 0 : currentPlayer + 1 })
-
-    setTimeout(() => this.gameTurn(), config.playSpeed)
-  }
-
-  playerTurn(player) {
-    const { stack, deck } = this.state
-
+    const { currentPlayer, players, stack, deck } = this.state
+    const player = players[currentPlayer]
     this.setState({ showLastCardFor: null })
 
-    const playableCards = player.cards.filter(card => this.mayPlayCard(card, stack[stack.length - 1]))
+    const playableCards = player.cards.filter(card => this.mayPlayCard(card, stack[stack.length - 1])) // @TODO: use some or find
 
     if (!playableCards || !playableCards.length) {
-      return player.cards = [...player.cards, ...grabCards(deck, 1)]
+      player.cards = [...player.cards, ...grabCards(deck, 1)] // @TODO: dont mutate
+      this.newRound()
+      return
     }
 
     if (deck.length === 0) {
       const cardsButOne = stack.length - 1
-      const newDeck = grabCards(stack, cardsButOne)
+      const newDeck = grabCards(stack, cardsButOne) // @TODO: dont mutate stack
       const shuffledDeck = shuffle(newDeck)
 
       this.setState({ deck: shuffledDeck })
@@ -158,6 +147,18 @@ export default class Index extends Component {
     }
 
     this.playCard(player, playableCards[0])
+
+    if (players[currentPlayer].cards.length === 0) {
+      return this.setState({ winner: players[currentPlayer].name })
+    }
+
+    this.newRound()
+  }
+
+  newRound() {
+    const { currentPlayer } = this.state
+    this.setState({ currentPlayer: currentPlayer === (config.playerAmount - 1) ? 0 : currentPlayer + 1 })
+    setTimeout(() => this.gameTurn(), config.playSpeed)
   }
 
   mayPlayCard(cardA, cardB) {
@@ -173,4 +174,36 @@ export default class Index extends Component {
 
     this.setState({ player, stack })
   }
+}
+
+function createDeck() {
+  const cardNumbers = [...Array(13).keys()].map(c => c + 1).map(c => {
+    const specialOnes = { 1: 'A', 11: 'J', 12: 'Q', 13: 'K', }
+    return specialOnes[c] || c
+  })
+
+  const cardTypes = ['heart', 'spade', 'clubs', 'diamond']
+  const cards = cardTypes.map(type => cardNumbers.map(number => ({ number, type })))
+
+  return shuffle(cardTypes.reduce((res, type) => [
+    ...res,
+    ...cardNumbers.map(number => ({ number, type }))
+  ], []))
+}
+
+function createPlayers(amount, cards, deck) {
+  return [...Array(amount)].map((_, i) => ({ name: randomName(), cards: grabCards(deck, cards) }))
+}
+
+function grabCards(deck, amount) {
+  return deck.splice(0, amount) // @TODO: return new instances, stop mutability, add comment
+}
+
+function shuffle(array) {
+  return array.sort(() => Math.random() - Math.random())
+}
+
+function randomName() {
+  const names = ['James', 'Daan', 'Levi', 'Sem', 'Xavi', 'Finn', 'Max', 'Logan', 'Mees', 'Thomas', 'Nova', 'Mila', 'Zoë', 'Eva', 'Olivia', 'Sara', 'Julia', 'Rosalie', 'Evi', 'Senna']
+  return names[Math.floor(Math.random() * names.length)]
 }
