@@ -1,5 +1,3 @@
-/* @TODO: game logic could be neater with promises and async await, also, utils are not really utils anymore */
-
 import { Component } from 'react'
 import { createGlobalStyle } from 'styled-components'
 import config from '../config'
@@ -114,8 +112,8 @@ export default class Index extends Component {
   }
 
   setupGame() {
-    const [firstCard, ...deck] = createDeck()
-    const players = createPlayers(config.playerAmount, config.cardsPerPlayer, deck) // @TODO: mutate deck here, comment mutates deck
+    const [firstCard, ...restOfDeck] = createDeck()
+    const [players, deck] = createPlayers(config.playerAmount, config.cardsPerPlayer, restOfDeck)
     const stack = [firstCard]
 
     this.setState({ deck, players, stack, currentPlayer: 0, showStartOverlay: true, showLastCardFor: null, winner: null })
@@ -126,20 +124,21 @@ export default class Index extends Component {
     const player = players[currentPlayer]
     this.setState({ showLastCardFor: null })
 
-    const playableCards = player.cards.filter(card => this.mayPlayCard(card, stack[stack.length - 1])) // @TODO: use some or find
+    const playableCards = player.cards.filter(card => canPlayCard(card, stack[stack.length - 1]))
 
     if (!playableCards || !playableCards.length) {
-      player.cards = [...player.cards, ...grabCards(deck, 1)] // @TODO: dont mutate
+      const [grabbedCards, newDeck] = grabCards(deck, 1)
+      player.cards = [...player.cards, ...grabbedCards]
+      this.setState({ deck: newDeck })
       this.newRound()
       return
     }
 
     if (deck.length === 0) {
       const cardsButOne = stack.length - 1
-      const newDeck = grabCards(stack, cardsButOne) // @TODO: dont mutate stack
+      const [newDeck, newStack] = grabCards(stack, cardsButOne)
       const shuffledDeck = shuffle(newDeck)
-
-      this.setState({ deck: shuffledDeck })
+      this.setState({ deck: shuffledDeck, stack: newStack })
     }
 
     if (player.cards.length === 2) {
@@ -161,29 +160,26 @@ export default class Index extends Component {
     setTimeout(() => this.gameTurn(), config.playSpeed)
   }
 
-  mayPlayCard(cardA, cardB) {
-    return cardA.number === cardB.number || cardA.type === cardB.type
-  }
-
   playCard(player, card) {
     const { stack } = this.state
+    const mutableStack = [...stack]
 
     const index = player.cards.indexOf(card)
-    const cardToPlay = player.cards.splice(index, 1)
-    stack.push(cardToPlay[0])
+    const [cardToPlay, remainingCards] = grabCards(player.cards, 1, index)
 
-    this.setState({ player, stack })
+    mutableStack.push(cardToPlay[0])
+    player.cards = remainingCards
+
+    this.setState({ player, stack: mutableStack })
   }
 }
 
 function createDeck() {
+  const cardTypes = ['heart', 'spade', 'clubs', 'diamond']
   const cardNumbers = [...Array(13).keys()].map(c => c + 1).map(c => {
     const specialOnes = { 1: 'A', 11: 'J', 12: 'Q', 13: 'K', }
     return specialOnes[c] || c
   })
-
-  const cardTypes = ['heart', 'spade', 'clubs', 'diamond']
-  const cards = cardTypes.map(type => cardNumbers.map(number => ({ number, type })))
 
   return shuffle(cardTypes.reduce((res, type) => [
     ...res,
@@ -191,12 +187,27 @@ function createDeck() {
   ], []))
 }
 
-function createPlayers(amount, cards, deck) {
-  return [...Array(amount)].map((_, i) => ({ name: randomName(), cards: grabCards(deck, cards) }))
+function canPlayCard(cardA, cardB) {
+  return cardA.number === cardB.number || cardA.type === cardB.type
 }
 
-function grabCards(deck, amount) {
-  return deck.splice(0, amount) // @TODO: return new instances, stop mutability, add comment
+function createPlayers(amount, cards, deck) {
+  let mutatableDeck = [...deck]
+
+  const players = [...Array(amount)].map((_, i) => {
+    const [grabbedCards, newDeck] = grabCards(mutatableDeck, cards)
+    mutatableDeck = newDeck
+
+    return { name: randomName(), cards: grabbedCards }
+  })
+
+  return [players, mutatableDeck]
+}
+
+function grabCards(deck, amount, startPosition = 0) {
+  const mutateableDeck = [...deck]
+  const cards = mutateableDeck.splice(startPosition, amount)
+  return [cards, mutateableDeck]
 }
 
 function shuffle(array) {
