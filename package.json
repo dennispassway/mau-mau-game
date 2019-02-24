@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "next -p 8000",
     "build": "next build",
+    "export": "next build && next export",
+    "deploy": "now ./out -A ../now.json && now alias",
     "start": "next start"
   },
   "dependencies": {
