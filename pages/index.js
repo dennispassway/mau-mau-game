@@ -1,8 +1,8 @@
+import { StartOverlay, LastCardOverlay, WinnerOverlay } from '../components/Overlay'
 import { useState, useEffect } from 'react'
 import config from '../config'
 import Deck from '../components/Deck'
 import Head from 'next/head'
-import Overlay from '../components/Overlay'
 import Player from '../components/Player'
 import Stack from '../components/Stack'
 import styled, { createGlobalStyle } from 'styled-components'
@@ -93,21 +93,9 @@ export default function Index() {
         </PlayersContainer>
       )}
 
-      {showStartOverlay && (<Overlay
-        title='Mau Mau Game'
-        text='Mau-Mau is a card game for 2 to 5 players that is popular in Germany, Austria, South Tyrol, the United States, Brazil, Poland, and the Netherlands. Mau-Mau is a member of the larger Crazy Eights or shedding family, to which e.g. the proprietary card games of Uno and Flaps belong. However Mau-Mau is played with standard French or German-suited playing cards.'
-        buttonLabel='Start the game'
-        onClick={startGame}
-      />)}
-
-      {showLastCardFor && <Overlay title={`Last card for ${showLastCardFor}!`} />}
-
-      {winner && <Overlay
-        title={`Game over! ${winner} has won!`}
-        text='That was fun! Want to make them play again?'
-        buttonLabel='Play again'
-        onClick={setupGame}
-      />}
+      {showStartOverlay && (<StartOverlay onClick={startGame} />)}
+      {showLastCardFor && <LastCardOverlay name={showLastCardFor} />}
+      {winner && <WinnerOverlay name={winner} onClick={setupGame} />}
     </div>
   )
 
