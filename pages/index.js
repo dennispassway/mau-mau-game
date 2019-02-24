@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react'
-import { createGlobalStyle } from 'styled-components'
 import config from '../config'
 import Deck from '../components/Deck'
 import Head from 'next/head'
 import Overlay from '../components/Overlay'
 import Player from '../components/Player'
 import Stack from '../components/Stack'
-import styled from 'styled-components'
+import styled, { createGlobalStyle } from 'styled-components'
 
 const GlobalStyle = createGlobalStyle`
   html {
@@ -51,15 +50,32 @@ const PlayersContainer = styled.div`
 `
 
 export default function Index() {
-  const [playerTurn, setPlayerTurn] = useState()
+  const [playerTurn, setPlayerTurn] = useState(0)
   const [deck, setDeck] = useState()
   const [players, setPlayers] = useState()
   const [showLastCardFor, setShowLastCardFor] = useState()
-  const [showStartOverlay, setShowStartOverlay] = useState()
+  const [showStartOverlay, setShowStartOverlay] = useState(true)
   const [stack, setStack] = useState()
-  const [winner, setWinner] = useState()
+  const [winner, setWinner] = useState(null)
 
   useEffect(setupGame, [])
+
+  useEffect(() => {
+    if (!showStartOverlay) {
+      setTimeout(gameTurn, config.playSpeed)
+    }
+  }, [playerTurn, showStartOverlay]) // This does not work if there's only 1 player, but who wants to play alone right?
+
+  // If there are no cards, create a new deck from the stack
+  useEffect(() => {
+    if (deck && deck.length === 0) {
+      const cardsButOne = stack.length - 1
+      const [newDeck, newStack] = grabCards(stack, cardsButOne)
+      const shuffledDeck = shuffle(newDeck)
+      setDeck(shuffledDeck)
+      setStack(newStack)
+    }
+  }, [deck])
 
   return (
     <div>
@@ -130,15 +146,6 @@ export default function Index() {
       return
     }
 
-    // If there are no cards, create a new deck from the stack
-    if (deck.length === 0) {
-      const cardsButOne = stack.length - 1
-      const [newDeck, newStack] = grabCards(stack, cardsButOne)
-      const shuffledDeck = shuffle(newDeck)
-      setDeck(shuffledDeck)
-      setStack(newStack)
-    }
-
     // Show last card popup if we have 2 cards left and are about to play
     if (player.cards.length === 2) {
       setShowLastCardFor(player.name)
@@ -158,7 +165,6 @@ export default function Index() {
   function nextGameTurn() {
     const nextPlayer = playerTurn === (config.playerAmount - 1) ? 0 : playerTurn + 1
     setPlayerTurn(nextPlayer)
-    setTimeout(gameTurn, config.playSpeed)
   }
 
   function playCard(player, card) {
