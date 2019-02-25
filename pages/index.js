@@ -62,7 +62,8 @@ export default function Index() {
 
   useEffect(() => {
     if (!showStartOverlay) {
-      setTimeout(gameTurn, config.playSpeed)
+      const timeOut = setTimeout(gameTurn, config.playSpeed)
+      return () => clearTimeout(timeOut)
     }
   }, [playerTurn, showStartOverlay]) // This does not work if there's only 1 player, but who wants to play alone right?
 
